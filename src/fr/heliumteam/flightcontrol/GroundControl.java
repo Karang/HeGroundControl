@@ -1,10 +1,12 @@
 package fr.heliumteam.flightcontrol;
 
+import fr.heliumteam.flightcontrol.com.DroneCom;
+import fr.heliumteam.flightcontrol.com.SimCom;
 import fr.heliumteam.flightcontrol.comp.Boussole;
 import fr.heliumteam.flightcontrol.comp.Gauge;
 import fr.heliumteam.flightcontrol.comp.Horizon;
 import fr.heliumteam.flightcontrol.comp.ValueDisplay;
-import gnu.io.CommPortIdentifier;
+//import gnu.io.CommPortIdentifier;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -24,8 +26,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import de.hardcode.jxinput.JXInputDevice;
-import de.hardcode.jxinput.JXInputManager;
+//import de.hardcode.jxinput.JXInputDevice;
+//import de.hardcode.jxinput.JXInputManager;
 
 public class GroundControl extends JFrame {
 	
@@ -50,7 +52,13 @@ public class GroundControl extends JFrame {
 	
 	private JTextArea console;
 	
+	// Drone
+	
+	public DroneCom droneCom;
+	
 	public GroundControl() {
+		this.setFocusable(true);
+		
 		this.pilote = new ControlHandler(this, "Pilote");
 		this.copilote = new ControlHandler(this, "Co-pilote");
 		
@@ -136,10 +144,10 @@ public class GroundControl extends JFrame {
 		
 		top.add(new JLabel("Pilote :"));
 		
-		final JComboBox<String> pilote_joystick = new JComboBox<String>();
-		for (int i=0 ; i<JXInputManager.getNumberOfDevices() ; i++) {
+		final JComboBox pilote_joystick = new JComboBox();
+		/*for (int i=0 ; i<JXInputManager.getNumberOfDevices() ; i++) {
 			pilote_joystick.addItem(JXInputManager.getJXInputDevice(i).getName());
-		}
+		}*/
 		pilote_joystick.addItem("Clavier");
 		top.add(pilote_joystick);
 		
@@ -147,18 +155,18 @@ public class GroundControl extends JFrame {
 		pilote_config.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent evt) {
-				openConfigFor(pilote, pilote_joystick.getItemAt(pilote_joystick.getSelectedIndex()));
+				openConfigFor(pilote, (String)pilote_joystick.getItemAt(pilote_joystick.getSelectedIndex()));
 			}
 		});
 		top.add(pilote_config);
 		
 		top.add(new JLabel("Co-pilote :"));
 		
-		final JComboBox<String> copilote_joystick = new JComboBox<String>();
+		final JComboBox copilote_joystick = new JComboBox();
 		copilote_joystick.addItem("Aucun");
-		for (int i=0 ; i<JXInputManager.getNumberOfDevices() ; i++) {
+		/*for (int i=0 ; i<JXInputManager.getNumberOfDevices() ; i++) {
 			copilote_joystick.addItem(JXInputManager.getJXInputDevice(i).getName());
-		}
+		}*/
 		copilote_joystick.addItem("Clavier");
 		top.add(copilote_joystick);
 		
@@ -166,27 +174,44 @@ public class GroundControl extends JFrame {
 		copilote_config.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent evt) {
-				openConfigFor(copilote, copilote_joystick.getItemAt(copilote_joystick.getSelectedIndex()));
+				openConfigFor(copilote, (String)copilote_joystick.getItemAt(copilote_joystick.getSelectedIndex()));
 			}
 		});
 		top.add(copilote_config);
 		
 		top.add(new JLabel("Drone :"));
 		
-		final JComboBox<String> drone_serial = new JComboBox<String>();
+		final JComboBox drone_serial = new JComboBox();
 		
-		Enumeration<?> enu = CommPortIdentifier.getPortIdentifiers();
+		/*Enumeration<?> enu = CommPortIdentifier.getPortIdentifiers();
 		while (enu.hasMoreElements()) {
 			CommPortIdentifier portId = (CommPortIdentifier) enu.nextElement();
 	        if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
 	        	drone_serial.addItem(portId.getName());
 	        }
-		}
+		}*/
+		drone_serial.addItem("Simulateur");
 		
 		top.add(drone_serial);
 		
 		JButton drone_connect = new JButton("Connecter");
 		top.add(drone_connect);
+		
+		final GroundControl gcs = this;
+		drone_connect.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (gcs.droneCom != null) {
+					gcs.console.append("Déjà connecté\n");
+					return;
+				}
+				String com = (String)drone_serial.getItemAt(drone_serial.getSelectedIndex());
+				if (com.equalsIgnoreCase("Simulateur")) {
+					gcs.droneCom = new SimCom("localhost", 11337, pilote);
+					gcs.droneCom.start();
+				}
+			}
+		});
 		
 		return top;
 	}
@@ -214,13 +239,14 @@ public class GroundControl extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				dialog.dispose();
+				ctrlHandler.resetWaitForKey();
 			}
 		});
 		
 		return config;
 	}
 	
-	public JXInputDevice getDevice(String name) {
+	/*public JXInputDevice getDevice(String name) {
 		for (int i=0 ; i<JXInputManager.getNumberOfDevices() ; i++) {
 			JXInputDevice d = JXInputManager.getJXInputDevice(i);
 			if (d.getName().equals(name)) {
@@ -228,18 +254,18 @@ public class GroundControl extends JFrame {
 			}
 		}
 		return null;
-	}
+	}*/
 	
 	public void openConfigFor(ControlHandler ctrlHandler, String name) {
 		if (name.equalsIgnoreCase("Aucun"))
 			return;
 		if (name.equalsIgnoreCase("Clavier")) {
-			ctrlHandler.setDevice(null);
+			//ctrlHandler.setDevice(null);
 		} else {
-			final JXInputDevice device = getDevice(name);
-			if (device==null)
+			//final JXInputDevice device = getDevice(name);
+			//if (device==null)
 				return;
-			ctrlHandler.setDevice(device);
+			//ctrlHandler.setDevice(device);
 		}
 		
 		final JDialog dialog = new JDialog(this);
