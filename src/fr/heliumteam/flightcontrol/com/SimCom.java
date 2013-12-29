@@ -27,7 +27,6 @@ public class SimCom extends DroneCom {
 	public void send(String msg) {
 		out.print(msg);
 		out.flush();
-		System.out.println("Sending :"+msg);
 	}
 	
 }

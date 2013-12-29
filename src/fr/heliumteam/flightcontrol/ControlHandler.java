@@ -41,14 +41,14 @@ public class ControlHandler implements /*JXInputAxisEventListener, JXInputButton
 	}
 
 	public void resetControls() {
-		controls.put("Monter", "");
-		controls.put("Descendre", "");
-		controls.put("Rotation droite", "");
-		controls.put("Rotation gauche", "");
-		controls.put("Translation avant", "");
-		controls.put("Translation arrière", "");
-		controls.put("Translation droite", "");
-		controls.put("Translation gauche", "");
+		controls.put("Monter", "Z");
+		controls.put("Descendre", "S");
+		controls.put("Rotation droite", "D");
+		controls.put("Rotation gauche", "Q");
+		controls.put("Translation avant", "I");
+		controls.put("Translation arrière", "K");
+		controls.put("Translation droite", "L");
+		controls.put("Translation gauche", "J");
 
 		for (String key : controls.keySet()) {
 			controlsDown.put(key, false);
