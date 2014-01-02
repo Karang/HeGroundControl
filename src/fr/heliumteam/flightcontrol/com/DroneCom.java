@@ -1,5 +1,7 @@
 package fr.heliumteam.flightcontrol.com;
 
+import java.nio.ByteBuffer;
+
 import fr.heliumteam.flightcontrol.ControlHandler;
 
 public abstract class DroneCom extends Thread {
@@ -24,13 +26,20 @@ public abstract class DroneCom extends Thread {
 		return (char)i;
 	}
 	
+	public byte[] encodePayload(char t, float a) {
+		ByteBuffer bb = ByteBuffer.allocate(6);
+		bb.putChar(t);
+		bb.putInt(Float.floatToIntBits(a));
+		return bb.array();
+	}
+	
 	@Override
 	public void run() {
 		while (!isInterrupted()) {
 			if (pilote.isActionDown("Monter")) {
-				thrust += 1;
+				thrust += 0.001;
 			} else if (pilote.isActionDown("Descendre")) {
-				thrust -= 1;
+				thrust -= 0.001;
 				if (thrust<0) thrust = 0;
 			}
 			
@@ -59,26 +68,26 @@ public abstract class DroneCom extends Thread {
 			//System.out.println("Thrust: "+thrust+" Yaw: "+yaw+" Pitch: "+pitch+" Roll:"+roll);
 			
 			if (lastThrust != thrust) {
-				send("T"+encodeValue(thrust));
+				send(encodePayload('T', thrust));
 				lastThrust = thrust;
 			}
 			
 			if (lastYaw != yaw) {
-				send("Y"+encodeAngle(yaw));
+				send(encodePayload('Y', yaw));
 				lastYaw = yaw;
 			}
 			
 			if (lastPitch != pitch) {
-				send("P"+encodeAngle(pitch));
+				send(encodePayload('P', pitch));
 				lastPitch = pitch;
 			}
 			
 			if (lastRoll != roll) {
-				send("R"+encodeAngle(roll));
+				send(encodePayload('R', roll));
 				lastRoll = roll;
 			}
 		}
 	}
 	
-	public abstract void send(String msg);
+	public abstract void send(byte[] msg);
 }

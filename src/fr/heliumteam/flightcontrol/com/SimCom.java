@@ -24,8 +24,8 @@ public class SimCom extends DroneCom {
 	}
 	
 	@Override
-	public void send(String msg) {
-		out.print(msg);
+	public void send(byte[] msg) {
+		out.print(new String(msg)+"\n");
 		out.flush();
 	}
 	
