@@ -301,8 +301,7 @@ public class Boussole extends JComponent {
         return IMAGE;
     }
 	
-	private void createTickmarks(Graphics2D g2)
-    {
+	private void createTickmarks(Graphics2D g2) {
         // Store former transformation
         AffineTransform FORMER_TRANSFORM = g2.getTransform();
 
@@ -311,32 +310,25 @@ public class Boussole extends JComponent {
         final BasicStroke THIN_STROKE;
         final int TEXT_DISTANCE;
         final int MIN_LENGTH;
-        final int MED_LENGTH;
         final int MAX_LENGTH;
-        if (getWidth() < 200)
-        {
+        if (getWidth() < 200) {
             MEDIUM_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
             THIN_STROKE = new BasicStroke(0.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
             STD_FONT = new Font("Verdana", 0, 6);
             TEXT_DISTANCE = 12;
             MIN_LENGTH = 2;
-            MED_LENGTH = 4;
             MAX_LENGTH = 6;
-        }
-        else
-        {
+        } else {
             MEDIUM_STROKE = new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
             THIN_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_BEVEL);
             STD_FONT = new Font("Verdana", 0, 9);
             TEXT_DISTANCE = 18;
             MIN_LENGTH = 4;
-            MED_LENGTH = 6;
             MAX_LENGTH = 8;
         }
         final Color TEXT_COLOR;
         final Color TICK_COLOR;
-        switch(brightness)
-        {
+        switch(brightness) {
             case DARK:
                 TEXT_COLOR = new Color(1.0f, 1.0f, 1.0f, 1.0f);
                 TICK_COLOR = new Color(1.0f, 1.0f, 1.0f, 1.0f);
