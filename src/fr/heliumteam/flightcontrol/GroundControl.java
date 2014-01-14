@@ -2,17 +2,19 @@ package fr.heliumteam.flightcontrol;
 
 import fr.heliumteam.flightcontrol.com.DroneCom;
 import fr.heliumteam.flightcontrol.com.SimCom;
+import fr.heliumteam.flightcontrol.com.XBeeCom;
 import fr.heliumteam.flightcontrol.comp.Boussole;
 import fr.heliumteam.flightcontrol.comp.Gauge;
 import fr.heliumteam.flightcontrol.comp.Horizon;
 import fr.heliumteam.flightcontrol.comp.ValueDisplay;
-//import gnu.io.CommPortIdentifier;
+import gnu.io.CommPortIdentifier;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Enumeration;
 import java.util.Map.Entry;
 
 import javax.swing.BorderFactory;
@@ -31,6 +33,8 @@ import javax.swing.JTextArea;
 public class GroundControl extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
+	
+	private static GroundControl gcs;
 	
 	// Pilotes
 	
@@ -56,6 +60,7 @@ public class GroundControl extends JFrame {
 	public DroneCom droneCom;
 	
 	public GroundControl() {
+		gcs = this;
 		this.setFocusable(true);
 		
 		this.pilote = new ControlHandler(this, "Pilote");
@@ -143,7 +148,7 @@ public class GroundControl extends JFrame {
 		
 		top.add(new JLabel("Pilote :"));
 		
-		final JComboBox pilote_joystick = new JComboBox();
+		final JComboBox<String> pilote_joystick = new JComboBox<String>();
 		/*for (int i=0 ; i<JXInputManager.getNumberOfDevices() ; i++) {
 			pilote_joystick.addItem(JXInputManager.getJXInputDevice(i).getName());
 		}*/
@@ -161,7 +166,7 @@ public class GroundControl extends JFrame {
 		
 		top.add(new JLabel("Co-pilote :"));
 		
-		final JComboBox copilote_joystick = new JComboBox();
+		final JComboBox<String> copilote_joystick = new JComboBox<String>();
 		copilote_joystick.addItem("Aucun");
 		/*for (int i=0 ; i<JXInputManager.getNumberOfDevices() ; i++) {
 			copilote_joystick.addItem(JXInputManager.getJXInputDevice(i).getName());
@@ -180,15 +185,15 @@ public class GroundControl extends JFrame {
 		
 		top.add(new JLabel("Drone :"));
 		
-		final JComboBox drone_serial = new JComboBox();
+		final JComboBox<String> drone_serial = new JComboBox<String>();
 		
-		/*Enumeration<?> enu = CommPortIdentifier.getPortIdentifiers();
+		Enumeration<?> enu = CommPortIdentifier.getPortIdentifiers();
 		while (enu.hasMoreElements()) {
 			CommPortIdentifier portId = (CommPortIdentifier) enu.nextElement();
 	        if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
 	        	drone_serial.addItem(portId.getName());
 	        }
-		}*/
+		}
 		drone_serial.addItem("Simulateur");
 		
 		top.add(drone_serial);
@@ -196,7 +201,6 @@ public class GroundControl extends JFrame {
 		JButton drone_connect = new JButton("Connecter");
 		top.add(drone_connect);
 		
-		final GroundControl gcs = this;
 		drone_connect.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -207,6 +211,9 @@ public class GroundControl extends JFrame {
 				String com = (String)drone_serial.getItemAt(drone_serial.getSelectedIndex());
 				if (com.equalsIgnoreCase("Simulateur")) {
 					gcs.droneCom = new SimCom("localhost", 11337, pilote);
+					gcs.droneCom.start();
+				} else {
+					gcs.droneCom = new XBeeCom(com, pilote);
 					gcs.droneCom.start();
 				}
 			}
@@ -315,6 +322,10 @@ public class GroundControl extends JFrame {
 		return console;
 	}
 
+	public static GroundControl getGCS() {
+		return gcs;
+	}
+	
 	public static void main(String[] args) {
 		final GroundControl gc = new GroundControl();
 		gc.setVisible(true);

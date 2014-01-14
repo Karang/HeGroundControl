@@ -2,9 +2,13 @@ package fr.heliumteam.flightcontrol.com;
 
 import java.nio.ByteBuffer;
 
-import fr.heliumteam.flightcontrol.ControlHandler;
+import com.rapplogic.xbee.api.PacketListener;
+import com.rapplogic.xbee.api.XBeeResponse;
 
-public abstract class DroneCom extends Thread {
+import fr.heliumteam.flightcontrol.ControlHandler;
+import fr.heliumteam.flightcontrol.GroundControl;
+
+public abstract class DroneCom extends Thread implements PacketListener {
 
 	private final ControlHandler pilote;
 	
@@ -13,17 +17,6 @@ public abstract class DroneCom extends Thread {
 	
 	public DroneCom(ControlHandler pilote) {
 		this.pilote = pilote;
-	}
-	
-	public char encodeValue(float v) {
-		int i = (int)((v/100f)*127f);
-		return (char)i;
-	}
-	
-	public char encodeAngle(float a) {
-		int i = (int)((a/360f)*127f);
-		System.out.println(i);
-		return (char)i;
 	}
 	
 	public byte[] encodePayload(char t, float a) {
@@ -37,16 +30,19 @@ public abstract class DroneCom extends Thread {
 	public void run() {
 		while (!isInterrupted()) {
 			if (pilote.isActionDown("Monter")) {
-				thrust += 0.001;
+				thrust += 0.5f;
+				if (thrust>100) thrust = 100;
 			} else if (pilote.isActionDown("Descendre")) {
-				thrust -= 0.001;
+				thrust -= 0.5f;
 				if (thrust<0) thrust = 0;
 			}
 			
 			if (pilote.isActionDown("Rotation gauche")) {
-				yaw -= 1;
+				yaw -= 0.5f;
+				if (yaw<0) yaw += 360;
 			} else if (pilote.isActionDown("Rotation droite")) {
-				yaw += 1;
+				yaw += 0.5f;
+				if (yaw>=360) yaw -= 360;
 			}
 			
 			if (pilote.isActionDown("Translation droite")) {
@@ -86,7 +82,27 @@ public abstract class DroneCom extends Thread {
 				send(encodePayload('R', roll));
 				lastRoll = roll;
 			}
+			
+			try {
+				Thread.sleep(10);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
+	}
+	
+	private byte[] convert(int[] i) {
+		byte [] b = new byte[i.length];
+		for (int j=0 ; j< i.length ; j++) {
+			b[j] = (byte)i[j];
+		}
+		return b;
+	}
+	
+	@Override
+	public void processResponse(XBeeResponse res) {
+		byte[] b = convert(res.getRawPacketBytes());
+		GroundControl.getGCS().getConsole().append(new String(b)+"\n");
 	}
 	
 	public abstract void send(byte[] msg);

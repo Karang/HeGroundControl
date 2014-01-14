@@ -8,7 +8,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/xbee-api/lib/log4j.jar"/>
-	<classpathentry kind="lib" path="lib/xbee-api/lib/RXTXcomm.jar"/>
+	<classpathentry kind="lib" path="lib/xbee-api/lib/RXTXcomm.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="HeGroundControl/lib/xbee-api"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="lib/xbee-api/xbee-api-0.9.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
