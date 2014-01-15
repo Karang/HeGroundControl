@@ -9,35 +9,33 @@ import java.util.Map.Entry;
 
 import javax.swing.JButton;
 
-/*import de.hardcode.jxinput.Axis;
+import de.hardcode.jxinput.Axis;
 import de.hardcode.jxinput.Button;
 import de.hardcode.jxinput.JXInputDevice;
 import de.hardcode.jxinput.event.JXInputAxisEvent;
 import de.hardcode.jxinput.event.JXInputAxisEventListener;
 import de.hardcode.jxinput.event.JXInputButtonEvent;
 import de.hardcode.jxinput.event.JXInputButtonEventListener;
-import de.hardcode.jxinput.event.JXInputEventManager;*/
+import de.hardcode.jxinput.event.JXInputEventManager;
 
-public class ControlHandler implements /*JXInputAxisEventListener, JXInputButtonEventListener,*/ KeyEventDispatcher {
+public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEventListener, KeyEventDispatcher {
 
-	private final GroundControl app;
 	private final String name;
 	private final Map<String, String> controls = new HashMap<String, String>();
 	private final Map<String, Boolean> controlsDown = new HashMap<String, Boolean>();
 
-	//private JXInputDevice device = null;
+	private JXInputDevice device = null;
 
 	// For config
 	private JButton waitingBtn = null;
 	private String waitingKey;
 
-	public ControlHandler(GroundControl app, String name) {
+	public ControlHandler(String name) {
 		this.name = name;
-		this.app = app;
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(this);
 		resetControls();
-		//setDevice(null);
+		setDevice(null);
 	}
 
 	public void resetControls() {
@@ -68,17 +66,14 @@ public class ControlHandler implements /*JXInputAxisEventListener, JXInputButton
 		return name;
 	}
 
-	/*public void setDevice(JXInputDevice device) {
+	public void setDevice(JXInputDevice device) {
 		if (this.device == device)
 			return;
 		this.device = device;
 
 		JXInputEventManager.reset();
-		app.removeKeyListener(this);
-
-		if (device == null) {
-			app.addKeyListener(this);
-		} else {
+		
+		if (device != null) {
 			for (int i=0 ; i<device.getMaxNumberOfAxes() ; i++) {
 				final Axis ax = device.getAxis(i);
 				if (ax != null) {
@@ -98,7 +93,7 @@ public class ControlHandler implements /*JXInputAxisEventListener, JXInputButton
 
 	public JXInputDevice getDevice() {
 		return device;
-	}*/
+	}
 
 	public void resetWaitForKey() {
 		this.waitingBtn = null;
@@ -115,6 +110,7 @@ public class ControlHandler implements /*JXInputAxisEventListener, JXInputButton
 
 	@Override
     public boolean dispatchKeyEvent(KeyEvent e) {
+		if (device!=null) return false;
 		if (e.getID() == KeyEvent.KEY_PRESSED) {
 			if (waitingBtn != null) {
 				String name = KeyEvent.getKeyText(e.getKeyCode());
@@ -152,7 +148,7 @@ public class ControlHandler implements /*JXInputAxisEventListener, JXInputButton
 		return null;
 	}
 
-	/*@Override
+	@Override
 	public void changed(JXInputButtonEvent e) {
 		if (waitingBtn != null) {
 			String name = e.getButton().getName();
@@ -172,6 +168,6 @@ public class ControlHandler implements /*JXInputAxisEventListener, JXInputButton
 			controls.put(waitingKey, name);
 			return;
 		}
-	}*/
+	}
 
 }

@@ -27,8 +27,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-//import de.hardcode.jxinput.JXInputDevice;
-//import de.hardcode.jxinput.JXInputManager;
+import de.hardcode.jxinput.JXInputDevice;
+import de.hardcode.jxinput.JXInputManager;
 
 public class GroundControl extends JFrame {
 	
@@ -39,7 +39,6 @@ public class GroundControl extends JFrame {
 	// Pilotes
 	
 	private final ControlHandler pilote;
-	private final ControlHandler copilote;
 	
 	// Instruments
 	
@@ -63,8 +62,7 @@ public class GroundControl extends JFrame {
 		gcs = this;
 		this.setFocusable(true);
 		
-		this.pilote = new ControlHandler(this, "Pilote");
-		this.copilote = new ControlHandler(this, "Co-pilote");
+		this.pilote = new ControlHandler("Pilote");
 		
 		this.setTitle("HeliumTeam : Ground control station");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -149,9 +147,9 @@ public class GroundControl extends JFrame {
 		top.add(new JLabel("Pilote :"));
 		
 		final JComboBox<String> pilote_joystick = new JComboBox<String>();
-		/*for (int i=0 ; i<JXInputManager.getNumberOfDevices() ; i++) {
+		for (int i=0 ; i<JXInputManager.getNumberOfDevices() ; i++) {
 			pilote_joystick.addItem(JXInputManager.getJXInputDevice(i).getName());
-		}*/
+		}
 		pilote_joystick.addItem("Clavier");
 		top.add(pilote_joystick);
 		
@@ -164,13 +162,13 @@ public class GroundControl extends JFrame {
 		});
 		top.add(pilote_config);
 		
-		top.add(new JLabel("Co-pilote :"));
+		/*top.add(new JLabel("Co-pilote :"));
 		
 		final JComboBox<String> copilote_joystick = new JComboBox<String>();
 		copilote_joystick.addItem("Aucun");
-		/*for (int i=0 ; i<JXInputManager.getNumberOfDevices() ; i++) {
+		for (int i=0 ; i<JXInputManager.getNumberOfDevices() ; i++) {
 			copilote_joystick.addItem(JXInputManager.getJXInputDevice(i).getName());
-		}*/
+		}
 		copilote_joystick.addItem("Clavier");
 		top.add(copilote_joystick);
 		
@@ -181,7 +179,7 @@ public class GroundControl extends JFrame {
 				openConfigFor(copilote, (String)copilote_joystick.getItemAt(copilote_joystick.getSelectedIndex()));
 			}
 		});
-		top.add(copilote_config);
+		top.add(copilote_config);*/
 		
 		top.add(new JLabel("Drone :"));
 		
@@ -252,7 +250,7 @@ public class GroundControl extends JFrame {
 		return config;
 	}
 	
-	/*public JXInputDevice getDevice(String name) {
+	public JXInputDevice getDevice(String name) {
 		for (int i=0 ; i<JXInputManager.getNumberOfDevices() ; i++) {
 			JXInputDevice d = JXInputManager.getJXInputDevice(i);
 			if (d.getName().equals(name)) {
@@ -260,18 +258,18 @@ public class GroundControl extends JFrame {
 			}
 		}
 		return null;
-	}*/
+	}
 	
 	public void openConfigFor(ControlHandler ctrlHandler, String name) {
 		if (name.equalsIgnoreCase("Aucun"))
 			return;
 		if (name.equalsIgnoreCase("Clavier")) {
-			//ctrlHandler.setDevice(null);
+			ctrlHandler.setDevice(null);
 		} else {
-			//final JXInputDevice device = getDevice(name);
-			//if (device==null)
+			final JXInputDevice device = getDevice(name);
+			if (device==null)
 				return;
-			//ctrlHandler.setDevice(device);
+			ctrlHandler.setDevice(device);
 		}
 		
 		final JDialog dialog = new JDialog(this);
@@ -284,10 +282,6 @@ public class GroundControl extends JFrame {
 	
 	public ControlHandler getPilote() {
 		return pilote;
-	}
-
-	public ControlHandler getCopilote() {
-		return copilote;
 	}
 
 	public Gauge getAltimetre() {
