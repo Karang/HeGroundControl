@@ -7,6 +7,7 @@ import fr.heliumteam.flightcontrol.comp.Boussole;
 import fr.heliumteam.flightcontrol.comp.Gauge;
 import fr.heliumteam.flightcontrol.comp.Horizon;
 import fr.heliumteam.flightcontrol.comp.ValueDisplay;
+import fr.heliumteam.flightcontrol.tools.SaveMapTool;
 import gnu.io.CommPortIdentifier;
 
 import java.awt.BorderLayout;
@@ -14,13 +15,17 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -39,6 +44,7 @@ public class GroundControl extends JFrame {
 	// Pilotes
 	
 	private final ControlHandler pilote;
+	private final JFileChooser fc = new JFileChooser();
 	
 	// Instruments
 	
@@ -221,8 +227,10 @@ public class GroundControl extends JFrame {
 	}
 	
 	private final JPanel buildConfigPanel(final JDialog dialog, final ControlHandler ctrlHandler) {
-		JPanel config = new JPanel();
+		final JPanel config = new JPanel();
 		config.setLayout(new GridLayout(0, 2));
+		
+		final Map<String, JButton> btnMap = new HashMap<String, JButton>();
 		
 		for (final Entry<String, String> entry : ctrlHandler.getControls().entrySet()) {
 			config.add(new JLabel(entry.getKey()));
@@ -233,6 +241,7 @@ public class GroundControl extends JFrame {
 					ctrlHandler.buttonWaitForKey(entry.getKey(), btn);
 				}
 			});
+			btnMap.put(entry.getKey(), btn);
 			config.add(btn);
 		}
 		
@@ -244,6 +253,36 @@ public class GroundControl extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				dialog.dispose();
 				ctrlHandler.resetWaitForKey();
+			}
+		});
+		
+		final JButton save_btn = new JButton("Save");
+		config.add(save_btn);
+		
+		save_btn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				int result = fc.showSaveDialog(config);
+				if (result == JFileChooser.APPROVE_OPTION) {
+					File file = fc.getSelectedFile();
+					SaveMapTool.saveMap(ctrlHandler.getControls(), file.getPath());
+					System.out.println("Saving config to "+file.getPath());
+				}
+			}
+		});
+		
+		final JButton load_btn = new JButton("Load");
+		config.add(load_btn);
+		
+		load_btn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				int result = fc.showOpenDialog(config);
+				if (result == JFileChooser.APPROVE_OPTION) {
+					File file = fc.getSelectedFile();
+					ctrlHandler.setControls(SaveMapTool.loadMap(file.getPath()), btnMap);
+					System.out.println("Loading config from "+file.getPath());
+				}
 			}
 		});
 		
@@ -315,6 +354,10 @@ public class GroundControl extends JFrame {
 	public JTextArea getConsole() {
 		return console;
 	}
+	
+	public void log(String msg) {
+		console.append(msg+"\n");
+		console.setCaretPosition(console.getDocument().getLength());	}
 
 	public static GroundControl getGCS() {
 		return gcs;

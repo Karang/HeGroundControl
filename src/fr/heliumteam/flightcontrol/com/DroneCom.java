@@ -2,13 +2,10 @@ package fr.heliumteam.flightcontrol.com;
 
 import java.nio.ByteBuffer;
 
-import com.rapplogic.xbee.api.PacketListener;
-import com.rapplogic.xbee.api.XBeeResponse;
-
 import fr.heliumteam.flightcontrol.ControlHandler;
 import fr.heliumteam.flightcontrol.GroundControl;
 
-public abstract class DroneCom extends Thread implements PacketListener {
+public abstract class DroneCom extends Thread {
 
 	private final ControlHandler pilote;
 	
@@ -61,6 +58,13 @@ public abstract class DroneCom extends Thread implements PacketListener {
 				pitch = 0;
 			}
 			
+			// Joystick
+			
+			thrust = pilote.getActionValue("Monter") - pilote.getActionValue("Descendre");
+			yaw = pilote.getActionValue("Rotation droite") - pilote.getActionValue("Rotation gauche");
+			pitch = pilote.getActionValue("Translation droite") - pilote.getActionValue("Translation gauche");
+			roll = pilote.getActionValue("Translation avant") - pilote.getActionValue("Translation arrière");
+			
 			//System.out.println("Thrust: "+thrust+" Yaw: "+yaw+" Pitch: "+pitch+" Roll:"+roll);
 			
 			if (lastThrust != thrust) {
@@ -71,6 +75,7 @@ public abstract class DroneCom extends Thread implements PacketListener {
 			if (lastYaw != yaw) {
 				send(encodePayload('Y', yaw));
 				lastYaw = yaw;
+				GroundControl.getGCS().log("Send Y");
 			}
 			
 			if (lastPitch != pitch) {
@@ -89,20 +94,6 @@ public abstract class DroneCom extends Thread implements PacketListener {
 				e.printStackTrace();
 			}
 		}
-	}
-	
-	private byte[] convert(int[] i) {
-		byte [] b = new byte[i.length];
-		for (int j=0 ; j< i.length ; j++) {
-			b[j] = (byte)i[j];
-		}
-		return b;
-	}
-	
-	@Override
-	public void processResponse(XBeeResponse res) {
-		byte[] b = convert(res.getRawPacketBytes());
-		GroundControl.getGCS().getConsole().append(new String(b)+"\n");
 	}
 	
 	public abstract void send(byte[] msg);

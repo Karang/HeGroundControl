@@ -23,6 +23,7 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 	private final String name;
 	private final Map<String, String> controls = new HashMap<String, String>();
 	private final Map<String, Boolean> controlsDown = new HashMap<String, Boolean>();
+	private final Map<String, Float> controlsValue = new HashMap<String, Float>();
 
 	private JXInputDevice device = null;
 
@@ -50,6 +51,7 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 
 		for (String key : controls.keySet()) {
 			controlsDown.put(key, false);
+			controlsValue.put(key, 0f);
 		}
 	}
 
@@ -57,9 +59,23 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 		if (!controlsDown.containsKey(action)) return false;
 		return controlsDown.get(action);
 	}
+	
+	public float getActionValue(String action) {
+		return controlsValue.get(action);
+	}
 
 	public Map<String, String> getControls() {
 		return controls;
+	}
+	
+	public void setControls(Map<String, String> map, Map<String, JButton> btn) {
+		for (Entry<String, String>e : map.entrySet()) {
+			controls.put(e.getKey(), e.getValue());
+			if (btn!=null) {
+				btn.get(e.getKey()).setText("<"+e.getValue()+">");
+			}
+		}
+		
 	}
 
 	public String getName() {
@@ -120,7 +136,7 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 				return false;
 			}
 			String keyText = KeyEvent.getKeyText(e.getKeyCode());
-			String action = getActionForKey(keyText);
+			String action = getActionFromValue(keyText);
 			if (action != null) {
 				controlsDown.put(action, true);
 			}
@@ -129,7 +145,7 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 				return false;
 			}
 			String keyText = KeyEvent.getKeyText(e.getKeyCode());
-			String action = getActionForKey(keyText);
+			String action = getActionFromValue(keyText);
 			if (action != null) {
 				controlsDown.put(action, false);
 			}
@@ -139,9 +155,9 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 		return true;
 	}
 	
-	public String getActionForKey(String key) {
+	public String getActionFromValue(String val) {
 		for (Entry<String, String> e : controls.entrySet()) {
-			if (e.getValue().equalsIgnoreCase(key)) {
+			if (e.getValue().equalsIgnoreCase(val)) {
 				return e.getKey();
 			}
 		}
@@ -168,6 +184,11 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 			controls.put(waitingKey, name);
 			return;
 		}
+		
+		String name = ((e.getDelta()>0)?"-":"+")+e.getAxis().getName();
+		String action = getActionFromValue(name);
+		
+		controlsValue.put(action, (float)e.getDelta());
 	}
 
 }

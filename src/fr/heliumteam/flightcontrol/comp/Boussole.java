@@ -518,6 +518,13 @@ public class Boussole extends JComponent {
 
 	public void setYaw(double yaw) {
 		this.yaw = yaw;
+		javax.swing.SwingUtilities.invokeLater(new java.lang.Runnable() {
+            @Override
+            public void run()
+            {
+                repaint();
+            }
+        });
 	}
 	
 }
