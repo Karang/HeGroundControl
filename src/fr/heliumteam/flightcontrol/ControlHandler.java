@@ -22,7 +22,6 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 
 	private final String name;
 	private final Map<String, String> controls = new HashMap<String, String>();
-	private final Map<String, Boolean> controlsDown = new HashMap<String, Boolean>();
 	private final Map<String, Float> controlsValue = new HashMap<String, Float>();
 
 	private JXInputDevice device = null;
@@ -50,14 +49,8 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 		controls.put("Translation gauche", "J");
 
 		for (String key : controls.keySet()) {
-			controlsDown.put(key, false);
 			controlsValue.put(key, 0f);
 		}
-	}
-
-	public boolean isActionDown(String action) {
-		if (!controlsDown.containsKey(action)) return false;
-		return controlsDown.get(action);
 	}
 	
 	public float getActionValue(String action) {
@@ -138,7 +131,7 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 			String keyText = KeyEvent.getKeyText(e.getKeyCode());
 			String action = getActionFromValue(keyText);
 			if (action != null) {
-				controlsDown.put(action, true);
+				controlsValue.put(action, 1f);
 			}
 		} else if (e.getID() == KeyEvent.KEY_RELEASED) {
 			if (waitingBtn != null) {
@@ -147,7 +140,7 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 			String keyText = KeyEvent.getKeyText(e.getKeyCode());
 			String action = getActionFromValue(keyText);
 			if (action != null) {
-				controlsDown.put(action, false);
+				controlsValue.put(action, 0f);
 			}
 		} else {
 			return false;
@@ -173,6 +166,11 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 			controls.put(waitingKey, name);
 			return;
 		}
+		
+		String name = e.getButton().getName();
+		String action = getActionFromValue(name);
+		
+		controlsValue.put(action, e.getButton().getState()?1f:0f);
 	}
 
 	@Override
@@ -188,7 +186,7 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 		String name = ((e.getDelta()>0)?"-":"+")+e.getAxis().getName();
 		String action = getActionFromValue(name);
 		
-		controlsValue.put(action, (float)e.getDelta());
+		controlsValue.put(action, (float)Math.abs(e.getDelta()));
 	}
 
 }

@@ -357,7 +357,8 @@ public class GroundControl extends JFrame {
 	
 	public void log(String msg) {
 		console.append(msg+"\n");
-		console.setCaretPosition(console.getDocument().getLength());	}
+		console.setCaretPosition(console.getDocument().getLength());
+	}
 
 	public static GroundControl getGCS() {
 		return gcs;
