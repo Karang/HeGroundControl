@@ -17,18 +17,29 @@ public abstract class DroneCom extends Thread {
 	}
 	
 	public byte[] encodePayload(char t, float a) {
-		ByteBuffer bb = ByteBuffer.allocate(6);
-		bb.putChar(t);
+		ByteBuffer bb = ByteBuffer.allocate(5);
+		bb.put((byte)t);
 		bb.putInt(Float.floatToIntBits(a));
 		return bb.array();
 	}
 	
+	public void printBytes(byte[] bytes) {
+		GroundControl.getGCS().log(bytArrayToHex(bytes));
+	}
+	
+	public String bytArrayToHex(byte[] a) {
+		StringBuilder sb = new StringBuilder();
+		for (byte b : a)
+			sb.append(String.format("%02x", b&0xff)).append(" ");
+		return sb.toString();
+	}
+
 	@Override
 	public void run() {
 		while (!isInterrupted()) {
 			
 			thrust = pilote.getActionValue("Monter") - pilote.getActionValue("Descendre");
-			yaw = (pilote.getActionValue("Rotation droite") - pilote.getActionValue("Rotation gauche"))*10f;
+			yaw = pilote.getActionValue("Rotation droite")*10f;
 			pitch = pilote.getActionValue("Translation droite") - pilote.getActionValue("Translation gauche");
 			roll = pilote.getActionValue("Translation avant") - pilote.getActionValue("Translation arrière");
 			
@@ -42,6 +53,7 @@ public abstract class DroneCom extends Thread {
 				send(encodePayload('Y', yaw));
 				lastYaw = yaw;
 				GroundControl.getGCS().log("Send Y "+yaw);
+				printBytes(encodePayload('Y', yaw));
 			}
 			
 			if (lastPitch != pitch) {
