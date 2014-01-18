@@ -55,10 +55,19 @@ public class XBeeCom extends DroneCom implements SerialPortEventListener {
 		if (evt.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
 			try {
 				String inputLine = input.readLine();
-				GroundControl.getGCS().log(inputLine);
-				float f = Float.parseFloat(inputLine);
-				//GroundControl.getGCS().getYaw().setYaw(f);
-				GroundControl.getGCS().getBatterie().setValue(f);
+				String [] data = inputLine.split(";");
+				
+				//GroundControl.getGCS().log(inputLine);
+				
+				float yaw = Float.parseFloat(data[0]);
+				float pitch = Float.parseFloat(data[1]);
+				float roll = Float.parseFloat(data[2]);
+				float batterie = Float.parseFloat(data[3]);
+				
+				GroundControl.getGCS().getYaw().setYaw(yaw);
+				GroundControl.getGCS().getPitchRoll().setPitch(pitch);
+				GroundControl.getGCS().getPitchRoll().setRoll(roll);
+				GroundControl.getGCS().getBatterie().setValue(batterie);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

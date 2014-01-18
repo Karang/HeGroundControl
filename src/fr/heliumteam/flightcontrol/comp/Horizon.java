@@ -359,6 +359,12 @@ public class Horizon extends JComponent {
 	 */
 	public void setPitch(float pitch) {
 		this.pitch = pitch;
+		javax.swing.SwingUtilities.invokeLater(new java.lang.Runnable() {
+            @Override
+            public void run() {
+                repaint();
+            }
+        });
 	}
 	
 	/**
@@ -366,6 +372,12 @@ public class Horizon extends JComponent {
 	 */
 	public void setRoll(float roll) {
 		this.roll = roll;
+		javax.swing.SwingUtilities.invokeLater(new java.lang.Runnable() {
+            @Override
+            public void run() {
+                repaint();
+            }
+        });
 	}
 	
 }

@@ -34,45 +34,55 @@ public abstract class DroneCom extends Thread {
 		return sb.toString();
 	}
 
+	public float correctAngle(float a) {
+		if (a>360f) {
+			return a-360f;
+		}
+		if (a<0) {
+			return a+360f;
+		}
+		return a;
+	}
+	
 	@Override
 	public void run() {
 		while (!isInterrupted()) {
 			
-			thrust = pilote.getActionValue("Monter") - pilote.getActionValue("Descendre");
-			yaw = pilote.getActionValue("Rotation droite")*10f;
-			pitch = pilote.getActionValue("Translation droite") - pilote.getActionValue("Translation gauche");
-			roll = pilote.getActionValue("Translation avant") - pilote.getActionValue("Translation arrière");
+			thrust += pilote.getActionValue("Monter") - pilote.getActionValue("Descendre");
+			yaw += (pilote.getActionValue("Rotation droite")-pilote.getActionValue("Rotation gauche"));
+			yaw = correctAngle(yaw);
+			pitch = correctAngle((pilote.getActionValue("Translation droite") - pilote.getActionValue("Translation gauche"))*30f);
+			roll = correctAngle((pilote.getActionValue("Translation avant") - pilote.getActionValue("Translation arrière"))*30f);
 			
 			if (lastThrust != thrust) {
 				send(encodePayload('T', thrust));
 				lastThrust = thrust;
-				GroundControl.getGCS().log("Send T "+thrust);
+				//GroundControl.getGCS().log("Send T "+thrust);
 			}
 			
 			if (lastYaw != yaw) {
 				send(encodePayload('Y', yaw));
 				lastYaw = yaw;
 				GroundControl.getGCS().log("Send Y "+yaw);
-				printBytes(encodePayload('Y', yaw));
 			}
 			
 			if (lastPitch != pitch) {
 				send(encodePayload('P', pitch));
 				lastPitch = pitch;
-				GroundControl.getGCS().log("Send P "+pitch);
+				//GroundControl.getGCS().log("Send P "+pitch);
 			}
 			
 			if (lastRoll != roll) {
 				send(encodePayload('R', roll));
 				lastRoll = roll;
-				GroundControl.getGCS().log("Send R "+roll);
+				//GroundControl.getGCS().log("Send R "+roll);
 			}
 			
-			/*try {
+			try {
 				Thread.sleep(10);
 			} catch(Exception e) {
 				e.printStackTrace();
-			}*/
+			}
 		}
 	}
 	
