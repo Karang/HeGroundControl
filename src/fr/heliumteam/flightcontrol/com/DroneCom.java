@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 
 import fr.heliumteam.flightcontrol.ControlHandler;
 import fr.heliumteam.flightcontrol.GroundControl;
+import fr.heliumteam.flightcontrol.tools.ByteTool;
 import fr.heliumteam.flightcontrol.tools.MathHelper;
 
 public abstract class DroneCom extends Thread {
@@ -17,24 +18,6 @@ public abstract class DroneCom extends Thread {
 		this.pilote = pilote;
 	}
 	
-	public byte[] encodePayload(char t, float a) {
-		ByteBuffer bb = ByteBuffer.allocate(5);
-		bb.put((byte)t);
-		bb.putInt(Float.floatToIntBits(a));
-		return bb.array();
-	}
-	
-	public void printBytes(byte[] bytes) {
-		GroundControl.getGCS().log(bytArrayToHex(bytes));
-	}
-	
-	public String bytArrayToHex(byte[] a) {
-		StringBuilder sb = new StringBuilder();
-		for (byte b : a)
-			sb.append(String.format("%02x", b&0xff)).append(" ");
-		return sb.toString();
-	}
-	
 	@Override
 	public void run() {
 		while (!isInterrupted()) {
@@ -46,25 +29,25 @@ public abstract class DroneCom extends Thread {
 			roll = MathHelper.correctAngle(-pilote.getActionValue("Translation droite")*30f);
 			
 			if (lastThrust != thrust) {
-				send(encodePayload('T', thrust));
+				send(ByteTool.encodePayload('T', thrust));
 				lastThrust = thrust;
 				//GroundControl.getGCS().log("Send T "+thrust);
 			}
 			
 			if (lastYaw != yaw) {
-				send(encodePayload('Y', yaw));
+				send(ByteTool.encodePayload('Y', yaw));
 				lastYaw = yaw;
 				//GroundControl.getGCS().log("Send Y "+yaw);
 			}
 			
 			if (lastPitch != pitch) {
-				send(encodePayload('P', pitch));
+				send(ByteTool.encodePayload('P', pitch));
 				lastPitch = pitch;
 				//GroundControl.getGCS().log("Send P "+pitch);
 			}
 			
 			if (lastRoll != roll) {
-				send(encodePayload('R', roll));
+				send(ByteTool.encodePayload('R', roll));
 				lastRoll = roll;
 				//GroundControl.getGCS().log("Send R "+roll);
 			}
