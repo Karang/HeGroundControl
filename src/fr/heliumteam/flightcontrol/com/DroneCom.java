@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 
 import fr.heliumteam.flightcontrol.ControlHandler;
 import fr.heliumteam.flightcontrol.GroundControl;
+import fr.heliumteam.flightcontrol.tools.MathHelper;
 
 public abstract class DroneCom extends Thread {
 
@@ -33,26 +34,16 @@ public abstract class DroneCom extends Thread {
 			sb.append(String.format("%02x", b&0xff)).append(" ");
 		return sb.toString();
 	}
-
-	public float correctAngle(float a) {
-		if (a>360f) {
-			return a-360f;
-		}
-		if (a<0) {
-			return a+360f;
-		}
-		return a;
-	}
 	
 	@Override
 	public void run() {
 		while (!isInterrupted()) {
 			
-			thrust += pilote.getActionValue("Monter") - pilote.getActionValue("Descendre");
-			yaw += (pilote.getActionValue("Rotation droite")-pilote.getActionValue("Rotation gauche"));
-			yaw = correctAngle(yaw);
-			pitch = correctAngle((pilote.getActionValue("Translation droite") - pilote.getActionValue("Translation gauche"))*30f);
-			roll = correctAngle((pilote.getActionValue("Translation avant") - pilote.getActionValue("Translation arrière"))*30f);
+			thrust += pilote.getActionValue("Monter");
+			yaw += pilote.getActionValue("Rotation droite");
+			yaw = MathHelper.correctAngle(yaw);
+			pitch = MathHelper.correctAngle(pilote.getActionValue("Translation avant")*30f);
+			roll = MathHelper.correctAngle(-pilote.getActionValue("Translation droite")*30f);
 			
 			if (lastThrust != thrust) {
 				send(encodePayload('T', thrust));
@@ -63,7 +54,7 @@ public abstract class DroneCom extends Thread {
 			if (lastYaw != yaw) {
 				send(encodePayload('Y', yaw));
 				lastYaw = yaw;
-				GroundControl.getGCS().log("Send Y "+yaw);
+				//GroundControl.getGCS().log("Send Y "+yaw);
 			}
 			
 			if (lastPitch != pitch) {

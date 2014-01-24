@@ -183,10 +183,14 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 			return;
 		}
 		
-		String name = ((e.getDelta()>0)?"-":"+")+e.getAxis().getName();
+		String name = "+"+e.getAxis().getName();
 		String action = getActionFromValue(name);
 		
-		controlsValue.put(action, (float)Math.abs(e.getDelta()));
+		String name2 = "-"+e.getAxis().getName();
+		String action2 = getActionFromValue(name2);
+		
+		controlsValue.put(action, (float)e.getAxis().getValue());
+		controlsValue.put(action2, (float)e.getAxis().getValue());
 	}
 
 }
