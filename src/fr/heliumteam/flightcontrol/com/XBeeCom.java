@@ -1,24 +1,21 @@
 package fr.heliumteam.flightcontrol.com;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import fr.heliumteam.flightcontrol.ControlHandler;
 import fr.heliumteam.flightcontrol.GroundControl;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
-import gnu.io.SerialPortEvent;
-import gnu.io.SerialPortEventListener;
 
-public class XBeeCom extends DroneCom implements SerialPortEventListener {
+public class XBeeCom extends DroneCom {
 
 	public static final int BAUD_RATE = 9600;
 	
 	private SerialPort serial;
 	
-	private BufferedReader input;
+	private InputStream input;
 	private OutputStream output;
 	
 	public XBeeCom(String com, ControlHandler pilote) {
@@ -29,11 +26,11 @@ public class XBeeCom extends DroneCom implements SerialPortEventListener {
 			serial = (SerialPort) id.open("DroneGCS", 2000);
 			serial.setSerialPortParams(BAUD_RATE,SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 			
-			input = new BufferedReader(new InputStreamReader(serial.getInputStream()));
+			input = serial.getInputStream();
 			output = serial.getOutputStream();
 			
-			serial.addEventListener(this);
-			serial.notifyOnDataAvailable(true);
+			final ReceiverThread th = new ReceiverThread(input);
+			th.start();
 			
 			GroundControl.getGCS().log("GCS connectée.");
 		} catch (Exception e) {
@@ -48,48 +45,5 @@ public class XBeeCom extends DroneCom implements SerialPortEventListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public void serialEvent(SerialPortEvent evt) {
-		if (evt.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
-			try {
-				String inputLine = input.readLine();
-				String [] data = inputLine.split(";");
-				
-				//GroundControl.getGCS().log(inputLine);
-				
-				float yaw, pitch, roll, batterie;
-				
-				try {
-					yaw = Float.parseFloat(data[0]);
-				} catch (NumberFormatException e) {
-					yaw = 0;
-				}
-				try {
-					pitch = Float.parseFloat(data[1]);
-				} catch (NumberFormatException e) {
-					pitch = 0;
-				}
-				try {
-					roll = Float.parseFloat(data[2]);
-				} catch (NumberFormatException e) {
-					roll = 0;
-				}
-				try {
-					batterie = Float.parseFloat(data[3]);
-				} catch (NumberFormatException e) {
-					batterie = 0;
-				}
-				
-				GroundControl.getGCS().getYaw().setYaw(yaw);
-				GroundControl.getGCS().getPitchRoll().setPitch(pitch);
-				GroundControl.getGCS().getPitchRoll().setRoll(roll);
-				GroundControl.getGCS().getBatterie().setValue(batterie);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
 	}
 }

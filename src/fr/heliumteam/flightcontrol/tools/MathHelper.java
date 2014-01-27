@@ -2,6 +2,8 @@ package fr.heliumteam.flightcontrol.tools;
 
 public class MathHelper {
 
+	public static final float EPS = 0.0001f;
+	
 	public static float correctAngle(float a) {
 		if (a>360f) {
 			return a-360f;
@@ -12,8 +14,18 @@ public class MathHelper {
 		return a;
 	}
 	
-	public float clamp(float value, float min, float max) {
+	public static boolean compareFloat(float a, float b) {
+		return Math.abs(a-b)<EPS;
+	}
+	
+	public static float clamp(float value, float min, float max) {
 		return Math.max(min, Math.min(value, max));
+	}
+
+	public static float checkZero(float value) {
+		if (value<EPS && value>-EPS)
+			return 0;
+		return value;
 	}
 	
 }

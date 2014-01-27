@@ -17,6 +17,7 @@ import de.hardcode.jxinput.event.JXInputAxisEventListener;
 import de.hardcode.jxinput.event.JXInputButtonEvent;
 import de.hardcode.jxinput.event.JXInputButtonEventListener;
 import de.hardcode.jxinput.event.JXInputEventManager;
+import fr.heliumteam.flightcontrol.tools.MathHelper;
 
 public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEventListener, KeyEventDispatcher {
 
@@ -183,14 +184,13 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 			return;
 		}
 		
-		String name = "+"+e.getAxis().getName();
-		String action = getActionFromValue(name);
+		String action = getActionFromValue("+"+e.getAxis().getName());
+		String action2 = getActionFromValue("-"+e.getAxis().getName());
 		
-		String name2 = "-"+e.getAxis().getName();
-		String action2 = getActionFromValue(name2);
+		float value = MathHelper.checkZero((float)e.getAxis().getValue());
 		
-		controlsValue.put(action, (float)e.getAxis().getValue());
-		controlsValue.put(action2, (float)e.getAxis().getValue());
+		controlsValue.put(action, value);
+		controlsValue.put(action2, value);
 	}
 
 }
