@@ -12,7 +12,7 @@ public abstract class DroneCom extends Thread {
 	private float lastYaw = 0, lastPitch = 0, lastRoll = 0, lastThrust = 0;
 	private float yaw = 0, pitch = 0, roll = 0, thrust = 0;
 	
-	//private long lastTime;
+	private long lastTime;
 	
 	public DroneCom(ControlHandler pilote) {
 		this.pilote = pilote;
@@ -20,15 +20,15 @@ public abstract class DroneCom extends Thread {
 	
 	@Override
 	public void run() {
-		//lastTime = System.currentTimeMillis();
+		lastTime = System.currentTimeMillis();
 		
 		while (!isInterrupted()) {
 			
-			//float dt = ((float)(System.currentTimeMillis() - lastTime)) / 1000f;
-			//lastTime = System.currentTimeMillis();
+			float dt = ((float)(System.currentTimeMillis() - lastTime)) / 1000f;
+			lastTime = System.currentTimeMillis();
 			
 			thrust += pilote.getActionValue("Monter");
-			yaw += pilote.getActionValue("Rotation droite");
+			yaw += pilote.getActionValue("Rotation droite")*100*dt;
 			yaw = MathHelper.correctAngle(yaw);
 			pitch = MathHelper.correctAngle(pilote.getActionValue("Translation avant")*30f);
 			roll = MathHelper.correctAngle(-pilote.getActionValue("Translation droite")*30f);
@@ -42,7 +42,7 @@ public abstract class DroneCom extends Thread {
 			if (!MathHelper.compareFloat(lastYaw, yaw)) {
 				send(ByteTool.encodePayload('Y', yaw));
 				lastYaw = yaw;
-				GroundControl.getGCS().log("Send Y "+yaw);
+				//GroundControl.getGCS().log("Send Y "+yaw);
 			}
 			
 			if (!MathHelper.compareFloat(lastPitch, pitch)) {
@@ -58,7 +58,7 @@ public abstract class DroneCom extends Thread {
 			}
 			
 			try {
-				Thread.sleep(10);
+				Thread.sleep(100);
 			} catch(Exception e) {
 				e.printStackTrace();
 			}

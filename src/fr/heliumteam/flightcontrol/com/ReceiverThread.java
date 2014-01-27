@@ -33,14 +33,13 @@ public class ReceiverThread extends Thread {
 				roll = ByteTool.byteToFloat(data[8], data[9], data[10], data[11]);
 				batterie = ByteTool.byteToFloat(data[12], data[13], data[14], data[15]);
 
-				//GroundControl.getGCS().log("Yaw : "+yaw);
-				ByteTool.printBytes(new byte[]{data[0], data[1], data[2], data[3]});
+				//GroundControl.getGCS().log("Recu : "+yaw);
+				//ByteTool.printBytes(new byte[]{data[0], data[1], data[2], data[3]});
 				
 				GroundControl.getGCS().getYaw().setYaw(yaw);
 				GroundControl.getGCS().getPitchRoll().setPitch(pitch);
 				GroundControl.getGCS().getPitchRoll().setRoll(roll);
 				GroundControl.getGCS().getBatterie().setValue(batterie);
-
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
