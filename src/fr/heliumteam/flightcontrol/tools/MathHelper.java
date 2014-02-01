@@ -21,6 +21,14 @@ public class MathHelper {
 	public static float clamp(float value, float min, float max) {
 		return Math.max(min, Math.min(value, max));
 	}
+	
+	public static float slope(float value, float min, float max) {
+		return (value-min)/(max-min);
+	}
+	
+	public static float lerp(float a, float b, float r) {
+		return a*r + b*(1-r);
+	}
 
 	public static float checkZero(float value) {
 		if (value<EPS && value>-EPS)

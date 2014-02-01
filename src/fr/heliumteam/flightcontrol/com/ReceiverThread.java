@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import fr.heliumteam.flightcontrol.GroundControl;
+import fr.heliumteam.flightcontrol.tools.BatteryTool;
 import fr.heliumteam.flightcontrol.tools.ByteTool;
 
 public class ReceiverThread extends Thread {
@@ -39,7 +40,7 @@ public class ReceiverThread extends Thread {
 				GroundControl.getGCS().getYaw().setYaw(yaw);
 				GroundControl.getGCS().getPitchRoll().setPitch(pitch);
 				GroundControl.getGCS().getPitchRoll().setRoll(roll);
-				GroundControl.getGCS().getBatterie().setValue(batterie);
+				GroundControl.getGCS().getBatterie().setValue(BatteryTool.getPercent(batterie));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
