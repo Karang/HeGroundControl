@@ -13,6 +13,15 @@ public class ByteTool {
 		return Float.intBitsToFloat(intbit);
 	}
 	
+	public static byte[] encodePIDPayload(float kP, float kI, float kD) {
+		ByteBuffer bb = ByteBuffer.allocate(13);
+		bb.put((byte)'K');
+		bb.putFloat(kP);
+		bb.putFloat(kI);
+		bb.putFloat(kD);
+		return bb.array();
+	}
+	
 	public static byte[] encodePayload(char t, float a) {
 		ByteBuffer bb = ByteBuffer.allocate(5);
 		bb.put((byte)t);

@@ -7,6 +7,7 @@ import fr.heliumteam.flightcontrol.comp.Boussole;
 import fr.heliumteam.flightcontrol.comp.Gauge;
 import fr.heliumteam.flightcontrol.comp.Horizon;
 import fr.heliumteam.flightcontrol.comp.ValueDisplay;
+import fr.heliumteam.flightcontrol.tools.ByteTool;
 import fr.heliumteam.flightcontrol.tools.SaveMapTool;
 import gnu.io.CommPortIdentifier;
 
@@ -30,7 +31,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JTextArea;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import de.hardcode.jxinput.JXInputDevice;
 import de.hardcode.jxinput.JXInputManager;
@@ -144,6 +148,70 @@ public class GroundControl extends JFrame {
 		
 		pan.add(console_pan);
 		
+		final JPanel pid_pan = new JPanel();
+		pid_pan.setBorder(BorderFactory.createTitledBorder("PID"));
+		pid_pan.setLayout(new GridLayout(0,3));
+		
+		final JLabel p_label = new JLabel("0");
+		pid_pan.add(new JLabel("P :"));
+		final JSlider p_slider = new JSlider(0, 100, 0);
+		p_slider.setMajorTickSpacing(10);
+		p_slider.setPaintTicks(true);
+		p_slider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent evt) {
+				p_label.setText(""+p_slider.getValue());
+			}
+		});
+		pid_pan.add(p_slider);
+		pid_pan.add(p_label);
+		
+		final JLabel i_label = new JLabel("0");
+		pid_pan.add(new JLabel("I :"));
+		final JSlider i_slider = new JSlider(0, 100, 0);
+		i_slider.setMajorTickSpacing(10);
+		i_slider.setPaintTicks(true);
+		i_slider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent evt) {
+				i_label.setText(""+i_slider.getValue());
+			}
+		});
+		pid_pan.add(i_slider);
+		pid_pan.add(i_label);
+		
+		final JLabel d_label = new JLabel("0");
+		pid_pan.add(new JLabel("D :"));
+		final JSlider d_slider = new JSlider(0, 100, 0);
+		d_slider.setMajorTickSpacing(10);
+		d_slider.setPaintTicks(true);
+		d_slider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent evt) {
+				d_label.setText(""+d_slider.getValue());
+			}
+		});
+		pid_pan.add(d_slider);
+		pid_pan.add(d_label);
+		
+		final JButton pid_btn = new JButton("Envoyer");
+		pid_btn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				float kP = p_slider.getValue() / 100.f;
+				float kI = i_slider.getValue() / 100.f;
+				float kD = d_slider.getValue() / 100.f;
+				GroundControl.getGCS().log("PID envoyés : "+kP+", "+kI+", "+kD);
+				final DroneCom com = GroundControl.getGCS().getDroneCom();
+				if (com != null) {
+					com.send(ByteTool.encodePIDPayload(kP, kI, kD));
+				}
+			}
+		});
+		pid_pan.add(pid_btn);
+		
+		pan.add(pid_pan);
+		
 		return pan;
 	}
 	
@@ -167,25 +235,6 @@ public class GroundControl extends JFrame {
 			}
 		});
 		top.add(pilote_config);
-		
-		/*top.add(new JLabel("Co-pilote :"));
-		
-		final JComboBox<String> copilote_joystick = new JComboBox<String>();
-		copilote_joystick.addItem("Aucun");
-		for (int i=0 ; i<JXInputManager.getNumberOfDevices() ; i++) {
-			copilote_joystick.addItem(JXInputManager.getJXInputDevice(i).getName());
-		}
-		copilote_joystick.addItem("Clavier");
-		top.add(copilote_joystick);
-		
-		final JButton copilote_config = new JButton("Config...");
-		copilote_config.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent evt) {
-				openConfigFor(copilote, (String)copilote_joystick.getItemAt(copilote_joystick.getSelectedIndex()));
-			}
-		});
-		top.add(copilote_config);*/
 		
 		top.add(new JLabel("Drone :"));
 		
@@ -317,6 +366,10 @@ public class GroundControl extends JFrame {
 		dialog.setSize(300, 200);
 		dialog.setContentPane(this.buildConfigPanel(dialog, ctrlHandler));
 		dialog.setVisible(true);
+	}
+	
+	public DroneCom getDroneCom() {
+		return droneCom;
 	}
 	
 	public ControlHandler getPilote() {
