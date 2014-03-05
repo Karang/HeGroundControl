@@ -60,7 +60,7 @@ public class GroundControl extends JFrame {
 	private Gauge forward_speed;
 	
 	private Gauge batterie;
-	private ValueDisplay batterieTime;
+	private ValueDisplay batterieVolt;
 	
 	private JTextArea console;
 	
@@ -130,9 +130,9 @@ public class GroundControl extends JFrame {
 		batterie.setMax(100);
 		batterie_pan.add(batterie);
 		
-		batterieTime = new ValueDisplay();
-		batterieTime.setUnit("min");
-		batterie_pan.add(batterieTime);
+		batterieVolt = new ValueDisplay();
+		batterieVolt.setUnit("V");
+		batterie_pan.add(batterieVolt);
 		
 		pan.add(batterie_pan);
 		
@@ -152,9 +152,9 @@ public class GroundControl extends JFrame {
 		pid_pan.setBorder(BorderFactory.createTitledBorder("PID"));
 		pid_pan.setLayout(new GridLayout(0,3));
 		
-		final JLabel p_label = new JLabel("0");
+		final JLabel p_label = new JLabel("100");
 		pid_pan.add(new JLabel("P :"));
-		final JSlider p_slider = new JSlider(0, 100, 0);
+		final JSlider p_slider = new JSlider(0, 100, 100);
 		p_slider.setMajorTickSpacing(10);
 		p_slider.setPaintTicks(true);
 		p_slider.addChangeListener(new ChangeListener() {
@@ -400,8 +400,8 @@ public class GroundControl extends JFrame {
 		return batterie;
 	}
 
-	public ValueDisplay getBatterieTime() {
-		return batterieTime;
+	public ValueDisplay getBatterieVolt() {
+		return batterieVolt;
 	}
 
 	public JTextArea getConsole() {

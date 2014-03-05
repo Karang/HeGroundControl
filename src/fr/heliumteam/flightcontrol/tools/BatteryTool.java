@@ -16,8 +16,12 @@ public class BatteryTool {
 	}
 	
 	public static float getPercent(float voltage) {
-		int i = getIndex(voltage);
-		float slope = MathHelper.slope(voltage, voltages[i-1], voltages[i]);
+		int i = getIndex(voltage*3.2f);
+		float slope = MathHelper.slope(voltage*3.2f, voltages[i-1], voltages[i]);
 		return MathHelper.clamp(MathHelper.lerp(pcent[i-1], pcent[i], slope), 0, 100);
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(getPercent(11.2f/3.2f));
 	}
 }

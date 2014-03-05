@@ -2,7 +2,7 @@ package fr.heliumteam.flightcontrol.tools;
 
 public class MathHelper {
 
-	public static final float EPS = 0.0001f;
+	public static final float EPS = 0.01f;
 	
 	public static float correctAngle(float a) {
 		if (a>360f) {
@@ -31,9 +31,14 @@ public class MathHelper {
 	}
 
 	public static float checkZero(float value) {
-		if (value<EPS && value>-EPS)
+		if (value<0.5 && value>-0.5)
 			return 0;
 		return value;
 	}
 	
+	public static float checkZero(float value, float eps) {
+		if (value<eps && value>-eps)
+			return 0;
+		return value;
+	}
 }

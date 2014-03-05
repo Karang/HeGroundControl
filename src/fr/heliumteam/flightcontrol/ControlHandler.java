@@ -187,7 +187,7 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 		String action = getActionFromValue("+"+e.getAxis().getName());
 		String action2 = getActionFromValue("-"+e.getAxis().getName());
 		
-		float value = MathHelper.checkZero((float)e.getAxis().getValue());
+		float value = (float)e.getAxis().getValue();
 		
 		controlsValue.put(action, value);
 		controlsValue.put(action2, value);
