@@ -252,6 +252,11 @@ public class GroundControl extends JFrame {
 		});
 		top.add(pilote_config);
 		
+		if (!((String)pilote_joystick.getItemAt(pilote_joystick.getSelectedIndex())).equalsIgnoreCase("Clavier")) {
+			this.pilote.setDevice(getDevice((String)pilote_joystick.getItemAt(pilote_joystick.getSelectedIndex())));
+			this.pilote.setControls(SaveMapTool.loadMap("../../config/joystick.cfg"), null);
+		}
+		
 		top.add(new JLabel("Drone :"));
 		
 		final JComboBox<String> drone_serial = new JComboBox<String>();

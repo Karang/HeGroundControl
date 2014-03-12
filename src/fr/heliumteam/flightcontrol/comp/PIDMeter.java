@@ -66,7 +66,6 @@ public class PIDMeter extends JPanel {
 			cur_data--;
 		}
 		this.buffer[cur_data++] = d;
-		//System.out.println(cur_data);
 		repaint();
 	}
 	
