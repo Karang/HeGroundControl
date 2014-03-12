@@ -6,12 +6,14 @@ import fr.heliumteam.flightcontrol.com.XBeeCom;
 import fr.heliumteam.flightcontrol.comp.Boussole;
 import fr.heliumteam.flightcontrol.comp.Gauge;
 import fr.heliumteam.flightcontrol.comp.Horizon;
+import fr.heliumteam.flightcontrol.comp.PIDMeter;
 import fr.heliumteam.flightcontrol.comp.ValueDisplay;
 import fr.heliumteam.flightcontrol.tools.ByteTool;
 import fr.heliumteam.flightcontrol.tools.SaveMapTool;
 import gnu.io.CommPortIdentifier;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -62,6 +64,10 @@ public class GroundControl extends JFrame {
 	private Gauge batterie;
 	private ValueDisplay batterieVolt;
 	
+	// Mesures
+	
+	private PIDMeter pidmeter;
+	
 	private JTextArea console;
 	
 	// Drone
@@ -104,7 +110,7 @@ public class GroundControl extends JFrame {
 		
 		pan.add(pos_pan);
 		
-		final JPanel vitesse_pan = new JPanel();
+		/*final JPanel vitesse_pan = new JPanel();
 		vitesse_pan.setBorder(BorderFactory.createTitledBorder("Vitesses"));
 		
 		up_speed = new Gauge();
@@ -119,7 +125,17 @@ public class GroundControl extends JFrame {
 		forward_speed.setMax(30);
 		vitesse_pan.add(forward_speed);
 		
-		pan.add(vitesse_pan);
+		pan.add(vitesse_pan);*/
+		
+		final JPanel pidmeter_pan = new JPanel();
+		pidmeter_pan.setBorder(BorderFactory.createTitledBorder("PID Meter"));
+		
+		pidmeter = new PIDMeter(300, 200, Color.red, 100);
+		pidmeter_pan.add(pidmeter);
+		
+		pan.add(pidmeter_pan);
+		
+		
 		
 		final JPanel batterie_pan = new JPanel();
 		batterie_pan.setBorder(BorderFactory.createTitledBorder("Batterie"));
@@ -406,6 +422,10 @@ public class GroundControl extends JFrame {
 
 	public JTextArea getConsole() {
 		return console;
+	}
+	
+	public PIDMeter getPIDMeter() {
+		return pidmeter;
 	}
 	
 	public void log(String msg) {

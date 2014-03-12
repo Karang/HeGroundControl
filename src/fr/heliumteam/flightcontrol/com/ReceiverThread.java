@@ -43,6 +43,9 @@ public class ReceiverThread extends Thread {
 				GroundControl.getGCS().getPitchRoll().setRoll(roll);
 				GroundControl.getGCS().getBatterieVolt().setValue(batterie);
 				GroundControl.getGCS().getBatterie().setValue(BatteryTool.getPercent(batterie));
+				
+				GroundControl.getGCS().getPIDMeter().addData(pitch);
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
