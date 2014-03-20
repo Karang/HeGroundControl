@@ -5,11 +5,11 @@ public class MathHelper {
 	public static final float EPS = 0.01f;
 	
 	public static float correctAngle(float a) {
-		if (a>360f) {
-			return a-360f;
+		while (a>180) {
+			a -= 360f;
 		}
-		if (a<0) {
-			return a+360f;
+		while (a<-180f) {
+			a += 360f;
 		}
 		return a;
 	}

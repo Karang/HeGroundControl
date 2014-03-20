@@ -36,6 +36,7 @@ public class Boussole extends JComponent {
 	
 	private BufferedImage backgroundImage = null;
 	private BufferedImage pointerImage = null;
+	private BufferedImage pointerRefImage = null;
 	private BufferedImage highlightImage = null;
 	
     private double offsetX = 0;
@@ -46,6 +47,7 @@ public class Boussole extends JComponent {
     private static String[] cards = {"S", "O", "N", "E"};
     
     private double yaw = 0;
+    private double yawRef = 0;
 	
 	public Boussole() {
 		super();
@@ -62,19 +64,23 @@ public class Boussole extends JComponent {
         if (pointerImage != null) {
             pointerImage.flush();
         }
+        if (pointerRefImage != null) {
+        	pointerRefImage.flush();
+        }
 		if (highlightImage != null) {
             highlightImage.flush();
         }
         highlightImage = createHighlight();
         
-        pointerImage = createPointer();
+        pointerImage = createPointer(new Color(0x970000), new Color(0xFF0000));
+        pointerRefImage = createPointer(new Color(0x009700), new Color(0x00FF00));
         offsetX = getWidth() / 2.0f - pointerImage.getWidth() / 2.0f;
         offsetY = getHeight() / 2.0f - pointerImage.getHeight() + pointerImage.getWidth() / 2.0f;
         rotationCenterX = pointerImage.getWidth() / 2.0d;
         rotationCenterY = pointerImage.getHeight() - pointerImage.getWidth() / 2.0d;
 	}
 	
-	private BufferedImage createPointer() {
+	private BufferedImage createPointer(Color c1, Color c2) {
         GraphicsConfiguration gfxConf = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
         final BufferedImage IMAGE = gfxConf.createCompatibleImage((int) (getWidth() * 0.06f), (int)(getHeight() * 0.37f), Transparency.TRANSLUCENT);
         Graphics2D g2 = IMAGE.createGraphics();
@@ -96,9 +102,9 @@ public class Boussole extends JComponent {
         pointerRight.lineTo(IMAGE.getWidth() / 2.0f, IMAGE.getHeight() * 0.92f);
         pointerRight.closePath();
 
-        g2.setColor(new Color(0x970000));
+        g2.setColor(c1);
         g2.fill(pointerRight);
-        g2.setColor(new Color(0xFF0000));
+        g2.setColor(c2);
         g2.fill(pointerLeft);
 
         final Ellipse2D OUTER_KNOB = new Ellipse2D.Double(0, IMAGE.getHeight() - IMAGE.getWidth(), IMAGE.getWidth(), IMAGE.getWidth());
@@ -505,6 +511,11 @@ public class Boussole extends JComponent {
         g2.drawImage(pointerImage, 0, 0, this);
 
         g2.setTransform(oldTransform);
+        
+        g2.translate(offsetX, offsetY);
+        g2.rotate(Math.toRadians(yawRef), rotationCenterX, rotationCenterY);
+        g2.drawImage(pointerRefImage, 0, 0, this);
+        
         g2.setTransform(oldTransform);
         
         g2.drawImage(highlightImage, 0, 0, this);
@@ -520,8 +531,21 @@ public class Boussole extends JComponent {
 		this.yaw = yaw;
 		javax.swing.SwingUtilities.invokeLater(new java.lang.Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
+                repaint();
+            }
+        });
+	}
+	
+	public double getYawRef() {
+		return yawRef;
+	}
+
+	public void setYawRef(double y) {
+		this.yawRef = y;
+		javax.swing.SwingUtilities.invokeLater(new java.lang.Runnable() {
+            @Override
+            public void run() {
                 repaint();
             }
         });

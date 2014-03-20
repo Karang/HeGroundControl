@@ -6,7 +6,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 
 import javax.swing.JPanel;
@@ -36,9 +35,9 @@ public class PIDMeter extends JPanel {
         int w = getWidth();
         int h = getHeight();
         int mid = h/2;
+        
         // Draw ordinate.
         g2.draw((Shape) new Line2D.Double(PAD, PAD, PAD, h-PAD));
-
         // Draw abcissa.
         g2.draw(new Line2D.Double(PAD, mid, w-PAD, mid));
         

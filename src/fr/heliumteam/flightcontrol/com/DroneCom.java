@@ -2,6 +2,7 @@ package fr.heliumteam.flightcontrol.com;
 
 import fr.heliumteam.flightcontrol.ControlHandler;
 import fr.heliumteam.flightcontrol.GroundControl;
+import fr.heliumteam.flightcontrol.comp.Boussole;
 import fr.heliumteam.flightcontrol.tools.ByteTool;
 import fr.heliumteam.flightcontrol.tools.MathHelper;
 
@@ -33,8 +34,8 @@ public abstract class DroneCom extends Thread {
 			thrust = MathHelper.clamp(thrust, 0, 100);
 			yaw += MathHelper.checkZero(pilote.getActionValue("Rotation droite"))*100*dt;
 			yaw = MathHelper.correctAngle(yaw);
-			pitch = MathHelper.checkZero(pilote.getActionValue("Translation avant")*30f, 6f);
-			roll = MathHelper.checkZero(-pilote.getActionValue("Translation droite")*30f, 6f);
+			pitch = MathHelper.checkZero(pilote.getActionValue("Translation avant")*50f, 6f);
+			roll = MathHelper.checkZero(-pilote.getActionValue("Translation droite")*50f, 6f);
 			
 			if (!MathHelper.compareFloat(lastThrust, thrust)) {
 				send(ByteTool.encodePayload('T', thrust));
@@ -42,11 +43,16 @@ public abstract class DroneCom extends Thread {
 				GroundControl.getGCS().log("Send T "+thrust);
 			}
 			
-			float y = (float)GroundControl.getGCS().getYaw().getYaw();
+			final Boussole b = GroundControl.getGCS().getYaw();
+			if (thrust == 0) {
+				b.setYawRef(b.getYaw());
+			}
+			
+			float y = MathHelper.correctAngle((float)(yaw+b.getYawRef()));
 			if (!MathHelper.compareFloat(lastYaw, y)) {
 				send(ByteTool.encodePayload('Y', y));
 				lastYaw = y;
-				//GroundControl.getGCS().log("Send Y "+yaw);
+				//GroundControl.getGCS().log("Send Y "+y+" "+b.getYaw());
 			}
 			
 			if (!MathHelper.compareFloat(lastPitch, pitch)) {

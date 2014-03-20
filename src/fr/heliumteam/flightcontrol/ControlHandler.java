@@ -17,7 +17,6 @@ import de.hardcode.jxinput.event.JXInputAxisEventListener;
 import de.hardcode.jxinput.event.JXInputButtonEvent;
 import de.hardcode.jxinput.event.JXInputButtonEventListener;
 import de.hardcode.jxinput.event.JXInputEventManager;
-import fr.heliumteam.flightcontrol.tools.MathHelper;
 
 public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEventListener, KeyEventDispatcher {
 
