@@ -11,14 +11,17 @@ import javax.swing.JButton;
 
 import de.hardcode.jxinput.Axis;
 import de.hardcode.jxinput.Button;
+import de.hardcode.jxinput.Directional;
 import de.hardcode.jxinput.JXInputDevice;
 import de.hardcode.jxinput.event.JXInputAxisEvent;
 import de.hardcode.jxinput.event.JXInputAxisEventListener;
 import de.hardcode.jxinput.event.JXInputButtonEvent;
 import de.hardcode.jxinput.event.JXInputButtonEventListener;
+import de.hardcode.jxinput.event.JXInputDirectionalEvent;
+import de.hardcode.jxinput.event.JXInputDirectionalEventListener;
 import de.hardcode.jxinput.event.JXInputEventManager;
 
-public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEventListener, KeyEventDispatcher {
+public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEventListener, JXInputDirectionalEventListener, KeyEventDispatcher {
 
 	private final String name;
 	private final Map<String, String> controls = new HashMap<String, String>();
@@ -39,14 +42,10 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 	}
 
 	public void resetControls() {
-		controls.put("Monter", "Z");
-		controls.put("Descendre", "S");
-		controls.put("Rotation droite", "D");
-		controls.put("Rotation gauche", "Q");
-		controls.put("Translation avant", "I");
-		controls.put("Translation arrière", "K");
-		controls.put("Translation droite", "L");
-		controls.put("Translation gauche", "J");
+		controls.put("Puissance", "Z");
+		controls.put("Lacet", "D");
+		controls.put("Tangage", "I");
+		controls.put("Roulis", "L");
 
 		for (String key : controls.keySet()) {
 			controlsValue.put(key, 0f);
@@ -83,19 +82,29 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 		JXInputEventManager.reset();
 		
 		if (device != null) {
+			
 			for (int i=0 ; i<device.getMaxNumberOfAxes() ; i++) {
 				final Axis ax = device.getAxis(i);
 				if (ax != null) {
-					JXInputEventManager.addListener(this, ax, 0.1);
+					//System.out.println(ax.getName());
+					JXInputEventManager.addListener(this, ax, 0.001);
 				}
 			}
 			for (int i=0 ; i<device.getMaxNumberOfButtons() ; i++) {
 				final Button btn = device.getButton(i);
 				if (btn != null) {
+					//System.out.println(btn.getName());
 					JXInputEventManager.addListener(this, btn);
 				}
 			}
-			JXInputEventManager.setTriggerIntervall(20);
+			for (int i=0 ; i<device.getMaxNumberOfDirectionals() ; i++) {
+				final Directional dir = device.getDirectional(i);
+				if (dir != null) {
+					System.out.println(dir.getName());
+					JXInputEventManager.addListener(this, dir);
+				}
+			}
+			JXInputEventManager.setTriggerIntervall(10);
 		}
 		resetControls();
 	}
@@ -176,20 +185,41 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 	@Override
 	public void changed(JXInputAxisEvent e) {
 		if (waitingBtn != null) {
-			String name = ((e.getDelta()>0)?"-":"+")+e.getAxis().getName();
+			String name = e.getAxis().getName();
 			waitingBtn.setText("<"+name+">");
 			waitingBtn = null;
 			controls.put(waitingKey, name);
 			return;
 		}
 		
-		String action = getActionFromValue("+"+e.getAxis().getName());
-		String action2 = getActionFromValue("-"+e.getAxis().getName());
-		
+		String action = getActionFromValue(e.getAxis().getName());
 		float value = (float)e.getAxis().getValue();
-		
 		controlsValue.put(action, value);
-		controlsValue.put(action2, value);
 	}
+
+	@Override
+	public void changed(JXInputDirectionalEvent e) {
+		if (waitingBtn != null) {
+			String name = e.getDirectional().getName();
+			waitingBtn.setText("<"+name+">");
+			waitingBtn = null;
+			controls.put(waitingKey, name);
+			return;
+		}
+		
+		String action = getActionFromValue(e.getDirectional().getName());
+		float value = (float)e.getDirectional().getValue();
+		if (e.getDirectional().getDirection()==9000) {
+			value *= -1f;
+		} else if (e.getDirectional().getDirection()==27000) {
+			value *= 1f;
+		} else {
+			value *= 0f;
+		}
+		System.out.println("Dir value: "+value);
+		controlsValue.put(action, value);
+	}
+	
+	
 
 }

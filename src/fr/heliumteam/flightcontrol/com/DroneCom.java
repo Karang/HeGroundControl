@@ -30,12 +30,12 @@ public abstract class DroneCom extends Thread {
 			float dt = ((float)(System.currentTimeMillis() - lastTime)) / 1000f;
 			lastTime = System.currentTimeMillis();
 			
-			thrust -= MathHelper.checkZero(pilote.getActionValue("Monter"))*40*dt;
+			thrust = (1-pilote.getActionValue("Puissance"))*100;
 			thrust = MathHelper.clamp(thrust, 0, 100);
-			yaw += MathHelper.checkZero(pilote.getActionValue("Rotation droite"))*100*dt;
+			yaw += pilote.getActionValue("Lacet")*100*dt;
 			yaw = MathHelper.correctAngle(yaw);
-			pitch = MathHelper.checkZero(pilote.getActionValue("Translation avant")*50f, 6f);
-			roll = MathHelper.checkZero(-pilote.getActionValue("Translation droite")*50f, 6f);
+			pitch = MathHelper.checkZero(pilote.getActionValue("Tangage")*50f, 6f);
+			roll = MathHelper.checkZero(-pilote.getActionValue("Roulis")*50f, 6f);
 			
 			if (!MathHelper.compareFloat(lastThrust, thrust)) {
 				send(ByteTool.encodePayload('T', thrust));
@@ -52,7 +52,7 @@ public abstract class DroneCom extends Thread {
 			if (!MathHelper.compareFloat(lastYaw, y)) {
 				send(ByteTool.encodePayload('Y', y));
 				lastYaw = y;
-				//GroundControl.getGCS().log("Send Y "+y+" "+b.getYaw());
+				GroundControl.getGCS().log("Send Y "+y+" "+yaw);
 			}
 			
 			if (!MathHelper.compareFloat(lastPitch, pitch)) {
