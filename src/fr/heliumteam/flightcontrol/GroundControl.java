@@ -135,8 +135,6 @@ public class GroundControl extends JFrame {
 		
 		pan.add(pidmeter_pan);
 		
-		
-		
 		final JPanel batterie_pan = new JPanel();
 		batterie_pan.setBorder(BorderFactory.createTitledBorder("Batterie"));
 		
@@ -168,9 +166,9 @@ public class GroundControl extends JFrame {
 		pid_pan.setBorder(BorderFactory.createTitledBorder("PID"));
 		pid_pan.setLayout(new GridLayout(0,3));
 		
-		final JLabel p_label = new JLabel("100");
+		final JLabel p_label = new JLabel("40");
 		pid_pan.add(new JLabel("P :"));
-		final JSlider p_slider = new JSlider(0, 100, 100);
+		final JSlider p_slider = new JSlider(0, 500, 40);
 		p_slider.setMajorTickSpacing(10);
 		p_slider.setPaintTicks(true);
 		p_slider.addChangeListener(new ChangeListener() {
@@ -184,7 +182,7 @@ public class GroundControl extends JFrame {
 		
 		final JLabel i_label = new JLabel("0");
 		pid_pan.add(new JLabel("I :"));
-		final JSlider i_slider = new JSlider(0, 100, 0);
+		final JSlider i_slider = new JSlider(0, 500, 0);
 		i_slider.setMajorTickSpacing(10);
 		i_slider.setPaintTicks(true);
 		i_slider.addChangeListener(new ChangeListener() {
@@ -198,7 +196,7 @@ public class GroundControl extends JFrame {
 		
 		final JLabel d_label = new JLabel("0");
 		pid_pan.add(new JLabel("D :"));
-		final JSlider d_slider = new JSlider(0, 100, 0);
+		final JSlider d_slider = new JSlider(0, 500, 0);
 		d_slider.setMajorTickSpacing(10);
 		d_slider.setPaintTicks(true);
 		d_slider.addChangeListener(new ChangeListener() {
@@ -214,9 +212,9 @@ public class GroundControl extends JFrame {
 		pid_btn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent evt) {
-				float kP = p_slider.getValue() / 100.f;
-				float kI = i_slider.getValue() / 100.f;
-				float kD = d_slider.getValue() / 100.f;
+				float kP = p_slider.getValue() / 1000.f;
+				float kI = i_slider.getValue() / 1000.f;
+				float kD = d_slider.getValue() / 1000.f;
 				GroundControl.getGCS().log("PID envoyés : "+kP+", "+kI+", "+kD);
 				final DroneCom com = GroundControl.getGCS().getDroneCom();
 				if (com != null) {
