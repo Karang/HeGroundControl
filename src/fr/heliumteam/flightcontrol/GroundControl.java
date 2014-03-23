@@ -34,6 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -96,11 +97,11 @@ public class GroundControl extends JFrame {
 		final JPanel pos_pan = new JPanel();
 		pos_pan.setBorder(BorderFactory.createTitledBorder("Position"));
 		
-		altimetre = new Gauge();
+		/*altimetre = new Gauge();
 		altimetre.setUnitString("m");
 		altimetre.setMin(0);
 		altimetre.setMax(20);
-		pos_pan.add(altimetre);
+		pos_pan.add(altimetre);*/
 		
 		yaw = new Boussole();
 		pos_pan.add(yaw);
@@ -162,13 +163,27 @@ public class GroundControl extends JFrame {
 		
 		pan.add(console_pan);
 		
+		// PID
+		
+		final JTabbedPane tab_pid_pan = new JTabbedPane();
+		
+		tab_pid_pan.addTab("Pitch", null, makePIDPanel("tangage", 'K', 40, 0, 0), "Réglages du tangage");
+		tab_pid_pan.addTab("Roll", null, makePIDPanel("roulis", 'L', 40, 0, 0), "Réglages du roulis");
+		tab_pid_pan.addTab("Yaw", null, makePIDPanel("lacet", 'M', 40, 0, 0), "Réglages du lacet");
+		
+		pan.add(tab_pid_pan);
+		
+		return pan;
+	}
+	
+	private final JPanel makePIDPanel(final String name, final char type, int kP, int kI, int kD) {
 		final JPanel pid_pan = new JPanel();
-		pid_pan.setBorder(BorderFactory.createTitledBorder("PID"));
+		//pid_pan.setBorder(BorderFactory.createTitledBorder("PID"));
 		pid_pan.setLayout(new GridLayout(0,3));
 		
-		final JLabel p_label = new JLabel("40");
+		final JLabel p_label = new JLabel(""+kP);
 		pid_pan.add(new JLabel("P :"));
-		final JSlider p_slider = new JSlider(0, 500, 40);
+		final JSlider p_slider = new JSlider(0, 500, kP);
 		p_slider.setMajorTickSpacing(10);
 		p_slider.setPaintTicks(true);
 		p_slider.addChangeListener(new ChangeListener() {
@@ -180,9 +195,9 @@ public class GroundControl extends JFrame {
 		pid_pan.add(p_slider);
 		pid_pan.add(p_label);
 		
-		final JLabel i_label = new JLabel("0");
+		final JLabel i_label = new JLabel(""+kI);
 		pid_pan.add(new JLabel("I :"));
-		final JSlider i_slider = new JSlider(0, 500, 0);
+		final JSlider i_slider = new JSlider(0, 500, kI);
 		i_slider.setMajorTickSpacing(10);
 		i_slider.setPaintTicks(true);
 		i_slider.addChangeListener(new ChangeListener() {
@@ -194,9 +209,9 @@ public class GroundControl extends JFrame {
 		pid_pan.add(i_slider);
 		pid_pan.add(i_label);
 		
-		final JLabel d_label = new JLabel("0");
+		final JLabel d_label = new JLabel(""+kD);
 		pid_pan.add(new JLabel("D :"));
-		final JSlider d_slider = new JSlider(0, 500, 0);
+		final JSlider d_slider = new JSlider(0, 500, kD);
 		d_slider.setMajorTickSpacing(10);
 		d_slider.setPaintTicks(true);
 		d_slider.addChangeListener(new ChangeListener() {
@@ -215,18 +230,16 @@ public class GroundControl extends JFrame {
 				float kP = p_slider.getValue() / 1000.f;
 				float kI = i_slider.getValue() / 1000.f;
 				float kD = d_slider.getValue() / 1000.f;
-				GroundControl.getGCS().log("PID envoyés : "+kP+", "+kI+", "+kD);
+				GroundControl.getGCS().log("PID de "+name+" envoyés : "+kP+", "+kI+", "+kD);
 				final DroneCom com = GroundControl.getGCS().getDroneCom();
 				if (com != null) {
-					com.send(ByteTool.encodePIDPayload(kP, kI, kD));
+					com.send(ByteTool.encodePIDPayload(type, kP, kI, kD));
 				}
 			}
 		});
 		pid_pan.add(pid_btn);
 		
-		pan.add(pid_pan);
-		
-		return pan;
+		return pid_pan;
 	}
 	
 	private final JPanel buildTopPanel() {

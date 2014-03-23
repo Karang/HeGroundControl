@@ -52,7 +52,7 @@ public abstract class DroneCom extends Thread {
 			if (!MathHelper.compareFloat(lastYaw, y)) {
 				send(ByteTool.encodePayload('Y', y));
 				lastYaw = y;
-				GroundControl.getGCS().log("Send Y "+y+" "+yaw);
+				//GroundControl.getGCS().log("Send Y "+y+" "+yaw);
 			}
 			
 			if (!MathHelper.compareFloat(lastPitch, pitch)) {

@@ -13,9 +13,9 @@ public class ByteTool {
 		return Float.intBitsToFloat(intbit);
 	}
 	
-	public static byte[] encodePIDPayload(float kP, float kI, float kD) {
+	public static byte[] encodePIDPayload(char type, float kP, float kI, float kD) {
 		ByteBuffer bb = ByteBuffer.allocate(13);
-		bb.put((byte)'K');
+		bb.put((byte)type);
 		bb.putFloat(kP);
 		bb.putFloat(kI);
 		bb.putFloat(kD);

@@ -100,7 +100,7 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 			for (int i=0 ; i<device.getMaxNumberOfDirectionals() ; i++) {
 				final Directional dir = device.getDirectional(i);
 				if (dir != null) {
-					System.out.println(dir.getName());
+					//System.out.println(dir.getName());
 					JXInputEventManager.addListener(this, dir);
 				}
 			}
@@ -216,7 +216,7 @@ public class ControlHandler implements JXInputAxisEventListener, JXInputButtonEv
 		} else {
 			value *= 0f;
 		}
-		System.out.println("Dir value: "+value);
+		//System.out.println("Dir value: "+value);
 		controlsValue.put(action, value);
 	}
 	
