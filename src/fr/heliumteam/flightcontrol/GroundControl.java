@@ -167,9 +167,9 @@ public class GroundControl extends JFrame {
 		
 		final JTabbedPane tab_pid_pan = new JTabbedPane();
 		
-		tab_pid_pan.addTab("Pitch", null, makePIDPanel("tangage", 'K', 40, 0, 0), "Réglages du tangage");
-		tab_pid_pan.addTab("Roll", null, makePIDPanel("roulis", 'L', 40, 0, 0), "Réglages du roulis");
-		tab_pid_pan.addTab("Yaw", null, makePIDPanel("lacet", 'M', 40, 0, 0), "Réglages du lacet");
+		tab_pid_pan.addTab("Pitch", null, makePIDPanel("tangage", 'K', 67, 0, 40), "Réglages du tangage");
+		tab_pid_pan.addTab("Roll", null, makePIDPanel("roulis", 'L', 67, 0, 40), "Réglages du roulis");
+		tab_pid_pan.addTab("Yaw", null, makePIDPanel("lacet", 'M', 67, 0, 40), "Réglages du lacet");
 		
 		pan.add(tab_pid_pan);
 		
